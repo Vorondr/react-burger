@@ -1,23 +1,15 @@
 .app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  color: var(--text-primary-color);
-  background-color: var(--background-alt);
+  max-width: 1240px;
+  margin: 0 auto;
 }
 
 .title {
-  width: 100%;
-  max-width: 1260px;
-  margin-right: auto;
-  margin-left: auto;
+  margin: 40px 0 20px;
 }
 
 .main {
-  display: flex;
-  justify-content: space-between;
-  width: 1240px;
-  height: 100%;
-  margin: 0 auto;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: 600px 600px;
+  align-items: start;
+  gap: 40px;
 }
