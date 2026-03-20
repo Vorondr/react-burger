@@ -2,14 +2,30 @@
   display: flex;
   flex-direction: column;
   max-width: 600px;
+  margin-top: 40px;
   color: var(--text-primary-color);
   font-family: 'Jet Brains Mono', serif;
 }
 
 .menu {
   display: flex;
-  margin: 0;
+  margin: 20px 0 40px;
   padding: 0;
   text-align: center;
   list-style-type: none;
+}
+
+.ingredients_container {
+  height: 720px;
+  padding-right: 8px;
+  overflow-y: auto;
+}
+
+.ingredients_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
 }
