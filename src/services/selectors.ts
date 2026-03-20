@@ -1,13 +1,16 @@
 import { createSelector } from '@reduxjs/toolkit';
 
+import { selectBun, selectConstructorIngredients } from './slices/constructorSlice';
+
 import type { RootState } from './store';
 
-const selectBun = (state: RootState): RootState['constructorBurger']['bun'] =>
-  state.constructorBurger.bun;
+const selectBunFromRoot = (state: RootState): ReturnType<typeof selectBun> =>
+  selectBun(state);
 
-const selectConstructorIngredients = (
+const selectIngredientsFromRoot = (
   state: RootState
-): RootState['constructorBurger']['ingredients'] => state.constructorBurger.ingredients;
+): ReturnType<typeof selectConstructorIngredients> =>
+  selectConstructorIngredients(state);
 
 export const makeSelectIngredientCount = (): ((
   state: RootState,
@@ -15,8 +18,8 @@ export const makeSelectIngredientCount = (): ((
 ) => number) =>
   createSelector(
     [
-      selectBun,
-      selectConstructorIngredients,
+      selectBunFromRoot,
+      selectIngredientsFromRoot,
       (_state: RootState, ingredientId: string): string => ingredientId,
     ],
     (bun, ingredients, ingredientId): number => {
@@ -28,13 +31,3 @@ export const makeSelectIngredientCount = (): ((
       return bunCount + ingredientsCount;
     }
   );
-
-export const selectTotalPrice = createSelector(
-  [selectBun, selectConstructorIngredients],
-  (bun, ingredients): number => {
-    const bunPrice = bun ? bun.price * 2 : 0;
-    const ingredientsPrice = ingredients.reduce((sum, item) => sum + item.price, 0);
-
-    return bunPrice + ingredientsPrice;
-  }
-);

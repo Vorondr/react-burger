@@ -1,30 +1,23 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useRef, useState, useMemo, useCallback } from 'react';
 
-import { IngredientCard } from '@components/ingredient-card/ingredient-card.tsx';
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details.tsx';
-import { Modal } from '@components/modal/modal.tsx';
+import { IngredientCard } from '@components/ingredient-card/ingredient-card';
+import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
+import { Modal } from '@components/modal/modal';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import {
   clearSelectedIngredient,
   setSelectedIngredient,
 } from '@services/slices/ingredientDetailsSlice';
 
-import type { TIngredient } from '@utils/types';
-
 import styles from './burger-ingredients.module.css';
-
-type TBurgerIngredientsProps = {
-  ingredients: TIngredient[];
-};
 
 type TTab = 'bun' | 'main' | 'sauce';
 
-export const BurgerIngredients = ({
-  ingredients,
-}: TBurgerIngredientsProps): React.JSX.Element => {
+export const BurgerIngredients = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
 
+  const ingredients = useAppSelector((state) => state.ingredients.ingredients);
   const selectedIngredient = useAppSelector(
     (state) => state.ingredientDetails.selectedIngredient
   );
@@ -47,7 +40,6 @@ export const BurgerIngredients = ({
   const [currentTab, setCurrentTab] = useState<TTab>('bun');
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-
   const bunRef = useRef<HTMLElement | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
   const sauceRef = useRef<HTMLElement | null>(null);
@@ -99,7 +91,7 @@ export const BurgerIngredients = ({
     setCurrentTab(closestTab.tab);
   }, []);
 
-  const onCloseModal = useCallback(() => {
+  const handleCloseModal = useCallback((): void => {
     dispatch(clearSelectedIngredient());
   }, [dispatch]);
 
@@ -177,7 +169,7 @@ export const BurgerIngredients = ({
       </div>
 
       {selectedIngredient && (
-        <Modal onClose={onCloseModal} title="Детали ингредиента">
+        <Modal onClose={handleCloseModal} title="Детали ингредиента">
           <IngredientDetails ingredient={selectedIngredient} />
         </Modal>
       )}

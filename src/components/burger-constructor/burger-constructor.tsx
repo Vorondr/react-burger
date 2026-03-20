@@ -7,15 +7,15 @@ import {
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { Modal } from '@components/modal/modal.tsx';
-import { OrderDetails } from '@components/order-details/order-details.tsx';
+import { Modal } from '@components/modal/modal';
+import { OrderDetails } from '@components/order-details/order-details';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
-import { selectTotalPrice } from '@services/selectors';
 import {
   addIngredient,
   removeIngredient,
   moveIngredient,
   clearConstructor,
+  selectTotalPrice,
 } from '@services/slices/constructorSlice';
 import { clearOrder, createOrder } from '@services/slices/orderSlice';
 
@@ -43,7 +43,7 @@ const ConstructorItem = ({ item, index }: TConstructorItemProps): React.JSX.Elem
 
   const [, dropRef] = useDrop<TDraggedConstructorItem>({
     accept: 'constructor-item',
-    hover(draggedItem) {
+    hover(draggedItem): void {
       if (!ref.current) {
         return;
       }
@@ -63,7 +63,7 @@ const ConstructorItem = ({ item, index }: TConstructorItemProps): React.JSX.Elem
   const [{ isDragging }, dragRef] = useDrag({
     type: 'constructor-item',
     item: { index },
-    collect: (monitor) => ({
+    collect: (monitor): { isDragging: boolean } => ({
       isDragging: monitor.isDragging(),
     }),
   });

@@ -1,3 +1,4 @@
+import { BASE_URL } from './constants';
 import { request } from './request';
 
 import type { TIngredient } from './types';
@@ -14,9 +15,8 @@ type TOrderResponse = {
   success: boolean;
 };
 
-const INGREDIENTS_URL =
-  'https://new-stellarburgers.education-services.ru/api/ingredients';
-const ORDERS_URL = 'https://new-stellarburgers.education-services.ru/api/orders';
+const INGREDIENTS_URL = `${BASE_URL}/ingredients`;
+const ORDERS_URL = `${BASE_URL}/orders`;
 
 export const getIngredients = (): Promise<TIngredient[]> =>
   request<TIngredientsResponse>(INGREDIENTS_URL).then((data) => data.data);

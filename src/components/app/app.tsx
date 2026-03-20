@@ -11,7 +11,7 @@ import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
-  const { ingredients, isLoading, error } = useAppSelector((state) => state.ingredients);
+  const { isLoading, error } = useAppSelector((state) => state.ingredients);
 
   useEffect(() => {
     void dispatch(fetchIngredients());
@@ -32,7 +32,7 @@ export const App = (): React.JSX.Element => {
         Соберите бургер
       </h1>
       <main className={`${styles.main}`}>
-        <BurgerIngredients ingredients={ingredients} />
+        <BurgerIngredients />
         <BurgerConstructor />
       </main>
     </div>

@@ -1,4 +1,9 @@
-import { createSlice, type PayloadAction, nanoid } from '@reduxjs/toolkit';
+import {
+  createSelector,
+  createSlice,
+  type PayloadAction,
+  nanoid,
+} from '@reduxjs/toolkit';
 
 import type { TIngredient } from '@utils/types';
 
@@ -49,10 +54,10 @@ const constructorSlice = createSlice({
       action: PayloadAction<{ fromIndex: number; toIndex: number }>
     ) => {
       const { fromIndex, toIndex } = action.payload;
-      const movedItem = state.ingredients[fromIndex];
+      const movedIngredient = state.ingredients[fromIndex];
 
       state.ingredients.splice(fromIndex, 1);
-      state.ingredients.splice(toIndex, 0, movedItem);
+      state.ingredients.splice(toIndex, 0, movedIngredient);
     },
 
     clearConstructor: (state) => {
@@ -60,9 +65,30 @@ const constructorSlice = createSlice({
       state.ingredients = [];
     },
   },
+  selectors: {
+    selectBun: (state): TConstructorState['bun'] => state.bun,
+    selectConstructorIngredients: (state): TConstructorState['ingredients'] =>
+      state.ingredients,
+    selectTotalPrice: createSelector(
+      [
+        (state: TConstructorState): TConstructorState['bun'] => state.bun,
+        (state: TConstructorState): TConstructorState['ingredients'] =>
+          state.ingredients,
+      ],
+      (bun, ingredients): number => {
+        const bunPrice = bun ? bun.price * 2 : 0;
+        const ingredientsPrice = ingredients.reduce((sum, item) => sum + item.price, 0);
+
+        return bunPrice + ingredientsPrice;
+      }
+    ),
+  },
 });
 
 export const { addIngredient, removeIngredient, moveIngredient, clearConstructor } =
   constructorSlice.actions;
+
+export const { selectBun, selectConstructorIngredients, selectTotalPrice } =
+  constructorSlice.selectors;
 
 export default constructorSlice.reducer;
