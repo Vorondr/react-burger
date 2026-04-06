@@ -24,7 +24,7 @@
   "dependencies": {
     "@babel/runtime": "^7.28.4",
     "@krgaa/react-developer-burger-ui-components": "^1.0.1",
-    "@reduxjs/toolkit": "^2.9.0",
+    "@reduxjs/toolkit": "^2.11.2",
     "core-js": "^3.45.1",
     "lodash-es": "^4.17.21",
     "react": "^19.1.1",
