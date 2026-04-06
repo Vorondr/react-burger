@@ -2,25 +2,14 @@ import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useRef, useState, useMemo, useCallback } from 'react';
 
 import { IngredientCard } from '@components/ingredient-card/ingredient-card';
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-import { Modal } from '@components/modal/modal';
-import { useAppDispatch, useAppSelector } from '@services/hooks';
-import {
-  clearSelectedIngredient,
-  setSelectedIngredient,
-} from '@services/slices/ingredientDetailsSlice';
+import { useAppSelector } from '@services/hooks';
 
 import styles from './burger-ingredients.module.css';
 
 type TTab = 'bun' | 'main' | 'sauce';
 
 export const BurgerIngredients = (): React.JSX.Element => {
-  const dispatch = useAppDispatch();
-
   const ingredients = useAppSelector((state) => state.ingredients.ingredients);
-  const selectedIngredient = useAppSelector(
-    (state) => state.ingredientDetails.selectedIngredient
-  );
 
   const buns = useMemo(
     () => ingredients.filter((item) => item.type === 'bun'),
@@ -91,10 +80,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
     setCurrentTab(closestTab.tab);
   }, []);
 
-  const handleCloseModal = useCallback((): void => {
-    dispatch(clearSelectedIngredient());
-  }, [dispatch]);
-
   return (
     <section className={styles.burger_ingredients}>
       <nav>
@@ -132,11 +117,7 @@ export const BurgerIngredients = (): React.JSX.Element => {
           <h2 className="text text_type_main-medium mb-6">Булки</h2>
           <ul className={styles.ingredients_grid}>
             {buns.map((item) => (
-              <IngredientCard
-                key={item._id}
-                ingredient={item}
-                onClick={() => dispatch(setSelectedIngredient(item))}
-              />
+              <IngredientCard key={item._id} ingredient={item} />
             ))}
           </ul>
         </section>
@@ -145,11 +126,7 @@ export const BurgerIngredients = (): React.JSX.Element => {
           <h2 className="text text_type_main-medium mb-6">Начинки</h2>
           <ul className={styles.ingredients_grid}>
             {mains.map((item) => (
-              <IngredientCard
-                key={item._id}
-                ingredient={item}
-                onClick={() => dispatch(setSelectedIngredient(item))}
-              />
+              <IngredientCard key={item._id} ingredient={item} />
             ))}
           </ul>
         </section>
@@ -158,21 +135,11 @@ export const BurgerIngredients = (): React.JSX.Element => {
           <h2 className="text text_type_main-medium mb-6">Соусы</h2>
           <ul className={styles.ingredients_grid}>
             {sauces.map((item) => (
-              <IngredientCard
-                key={item._id}
-                ingredient={item}
-                onClick={() => dispatch(setSelectedIngredient(item))}
-              />
+              <IngredientCard key={item._id} ingredient={item} />
             ))}
           </ul>
         </section>
       </div>
-
-      {selectedIngredient && (
-        <Modal onClose={handleCloseModal} title="Детали ингредиента">
-          <IngredientDetails ingredient={selectedIngredient} />
-        </Modal>
-      )}
     </section>
   );
 };

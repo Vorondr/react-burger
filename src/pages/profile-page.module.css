@@ -1,0 +1,58 @@
+.page {
+  display: flex;
+  justify-content: center;
+  padding-top: 120px;
+}
+
+.container {
+  display: flex;
+  gap: 60px;
+  width: 1240px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 80px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.link_active {
+  color: #f2f2f3;
+}
+
+.logout {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  appearance: none;
+  appearance: none;
+}
+
+.description {
+  opacity: 0.4;
+}

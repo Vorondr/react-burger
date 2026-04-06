@@ -2,14 +2,3 @@
   max-width: 1240px;
   margin: 0 auto;
 }
-
-.title {
-  margin: 40px 0 20px;
-}
-
-.main {
-  display: grid;
-  grid-template-columns: 600px 600px;
-  align-items: start;
-  gap: 40px;
-}
