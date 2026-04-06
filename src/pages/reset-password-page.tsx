@@ -3,9 +3,10 @@ import {
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm.ts';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { clearAuthError, resetPassword } from '@services/slices/authSlice';
 import { isResetPasswordRequested } from '@utils/auth';
@@ -16,12 +17,6 @@ export const ResetPasswordPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { isLoading, error } = useAppSelector((state) => state.auth);
-
-  const [form, setForm] = useState({
-    password: '',
-    token: '',
-  });
-
   const canOpenPage = isResetPasswordRequested();
 
   useEffect((): (() => void) => {
@@ -32,12 +27,10 @@ export const ResetPasswordPage = (): React.JSX.Element => {
     };
   }, [dispatch]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const { values: form, handleChange } = useForm({
+    password: '',
+    token: '',
+  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();

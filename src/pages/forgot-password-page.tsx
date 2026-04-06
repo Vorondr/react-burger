@@ -1,7 +1,8 @@
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { clearAuthError, forgotPassword } from '@services/slices/authSlice';
 
@@ -12,8 +13,6 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
   const navigate = useNavigate();
   const { isLoading, error } = useAppSelector((state) => state.auth);
 
-  const [email, setEmail] = useState('');
-
   useEffect((): (() => void) => {
     dispatch(clearAuthError());
 
@@ -22,14 +21,14 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
     };
   }, [dispatch]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setEmail(e.target.value);
-  };
+  const { values, handleChange } = useForm({
+    email: '',
+  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
-    void dispatch(forgotPassword(email)).then((resultAction) => {
+    void dispatch(forgotPassword(values.email)).then((resultAction) => {
       if (forgotPassword.fulfilled.match(resultAction)) {
         void navigate('/reset-password');
       }
@@ -43,7 +42,7 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
 
         <EmailInput
           name="email"
-          value={email}
+          value={values.email}
           onChange={handleChange}
           placeholder="Укажите e-mail"
           extraClass="mb-6"

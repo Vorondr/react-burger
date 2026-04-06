@@ -3,9 +3,10 @@ import {
   EmailInput,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { clearAuthError, loginUser } from '@services/slices/authSlice';
 
@@ -15,6 +16,7 @@ type TLocationState = {
   from?: {
     pathname: string;
   };
+  createOrderAfterLogin?: boolean;
 };
 
 export const LoginPage = (): React.JSX.Element => {
@@ -24,11 +26,6 @@ export const LoginPage = (): React.JSX.Element => {
 
   const { isLoading, error } = useAppSelector((state) => state.auth);
 
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
-
   useEffect((): (() => void) => {
     dispatch(clearAuthError());
 
@@ -37,12 +34,10 @@ export const LoginPage = (): React.JSX.Element => {
     };
   }, [dispatch]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const { values: form, handleChange } = useForm({
+    email: '',
+    password: '',
+  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -51,7 +46,14 @@ export const LoginPage = (): React.JSX.Element => {
       if (loginUser.fulfilled.match(resultAction)) {
         const state = location.state as TLocationState | null;
         const from = state?.from?.pathname ?? '/';
-        void navigate(from, { replace: true });
+        const createOrderAfterLogin = state?.createOrderAfterLogin ?? false;
+
+        void navigate(from, {
+          replace: true,
+          state: {
+            createOrderAfterLogin,
+          },
+        });
       }
     });
   };

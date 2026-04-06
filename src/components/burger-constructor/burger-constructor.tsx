@@ -4,8 +4,9 @@ import {
   DragIcon,
   Button,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { useLocation, useNavigate, type Location } from 'react-router-dom';
 
 import { Modal } from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
@@ -35,6 +36,11 @@ type TConstructorItemProps = {
     image: string;
   };
   index: number;
+};
+
+type TLocationState = {
+  createOrderAfterLogin?: boolean;
+  from?: Location;
 };
 
 const ConstructorItem = ({ item, index }: TConstructorItemProps): React.JSX.Element => {
@@ -80,7 +86,9 @@ const ConstructorItem = ({ item, index }: TConstructorItemProps): React.JSX.Elem
         text={item.name}
         price={item.price}
         thumbnail={item.image}
-        handleClose={() => dispatch(removeIngredient(item.uuid))}
+        handleClose={(): void => {
+          dispatch(removeIngredient(item.uuid));
+        }}
       />
     </li>
   );
@@ -88,13 +96,21 @@ const ConstructorItem = ({ item, index }: TConstructorItemProps): React.JSX.Elem
 
 export const BurgerConstructor = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const bun = useAppSelector((state) => state.constructorBurger.bun);
   const fills = useAppSelector((state) => state.constructorBurger.ingredients);
   const { orderNumber, isLoading, error } = useAppSelector((state) => state.order);
+  const user = useAppSelector((state) => state.auth.user);
   const totalPrice = useAppSelector(selectTotalPrice);
 
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+
+  const ingredientIds = bun ? [bun._id, ...fills.map((item) => item._id), bun._id] : [];
+
+  const locationState = location.state as TLocationState | null;
+  const shouldCreateOrderAfterLogin = locationState?.createOrderAfterLogin ?? false;
 
   const [{ isHover }, dropRef] = useDrop<TIngredient, void, { isHover: boolean }>(
     () => ({
@@ -108,15 +124,51 @@ export const BurgerConstructor = (): React.JSX.Element => {
     })
   );
 
+  useEffect((): void => {
+    if (!user || !shouldCreateOrderAfterLogin || !bun) {
+      return;
+    }
+
+    void dispatch(createOrder(ingredientIds)).then((resultAction) => {
+      if (createOrder.fulfilled.match(resultAction)) {
+        setIsOrderModalOpen(true);
+      }
+
+      void navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    });
+  }, [
+    bun,
+    dispatch,
+    ingredientIds,
+    location.pathname,
+    navigate,
+    shouldCreateOrderAfterLogin,
+    user,
+  ]);
+
   const handleOpenOrderModal = (): void => {
     if (!bun) {
       return;
     }
 
-    const ingredientIds = [bun._id, ...fills.map((item) => item._id), bun._id];
+    if (!user) {
+      void navigate('/login', {
+        state: {
+          from: location,
+          createOrderAfterLogin: true,
+        },
+      });
+      return;
+    }
 
-    void dispatch(createOrder(ingredientIds));
-    setIsOrderModalOpen(true);
+    void dispatch(createOrder(ingredientIds)).then((resultAction) => {
+      if (createOrder.fulfilled.match(resultAction)) {
+        setIsOrderModalOpen(true);
+      }
+    });
   };
 
   const handleCloseOrderModal = (): void => {

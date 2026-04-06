@@ -3,8 +3,9 @@ import {
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useMemo, type FormEvent } from 'react';
 
+import { useForm } from '@hooks/useForm.ts';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { clearAuthError, updateUser } from '@services/slices/authSlice';
 
@@ -29,15 +30,12 @@ export const ProfileFormPage = (): React.JSX.Element => {
     [user?.name, user?.email]
   );
 
-  const [form, setForm] = useState<TProfileForm>(initialForm);
-
-  useEffect((): void => {
-    setForm({
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      password: '',
-    });
-  }, [user?.name, user?.email]);
+  const {
+    values: form,
+    handleChange,
+    setValues,
+    resetForm,
+  } = useForm<TProfileForm>(initialForm);
 
   useEffect((): (() => void) => {
     dispatch(clearAuthError());
@@ -47,12 +45,13 @@ export const ProfileFormPage = (): React.JSX.Element => {
     };
   }, [dispatch]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  useEffect((): void => {
+    setValues({
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      password: '',
+    });
+  }, [setValues, user?.email, user?.name]);
 
   const isChanged =
     form.name !== initialForm.name ||
@@ -60,7 +59,7 @@ export const ProfileFormPage = (): React.JSX.Element => {
     form.password !== '';
 
   const handleCancel = (): void => {
-    setForm(initialForm);
+    resetForm(initialForm);
     dispatch(clearAuthError());
   };
 
@@ -75,7 +74,7 @@ export const ProfileFormPage = (): React.JSX.Element => {
       })
     ).then((resultAction) => {
       if (updateUser.fulfilled.match(resultAction)) {
-        setForm({
+        resetForm({
           name: resultAction.payload.name,
           email: resultAction.payload.email,
           password: '',

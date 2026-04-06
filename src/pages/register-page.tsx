@@ -4,9 +4,10 @@ import {
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useForm } from '@hooks/useForm';
 import { useAppDispatch, useAppSelector } from '@services/hooks';
 import { registerUser, clearAuthError } from '@services/slices/authSlice';
 
@@ -16,18 +17,11 @@ export const RegisterPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.auth);
 
-  const [form, setForm] = useState({
+  const { values: form, handleChange } = useForm({
     name: '',
     email: '',
     password: '',
   });
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
