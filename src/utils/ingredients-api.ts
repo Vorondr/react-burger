@@ -1,3 +1,4 @@
+import { fetchWithRefresh, getAuthHeader } from './auth-api';
 import { BASE_URL } from './constants';
 import { request } from './request';
 
@@ -22,10 +23,11 @@ export const getIngredients = (): Promise<TIngredient[]> =>
   request<TIngredientsResponse>(INGREDIENTS_URL).then((data) => data.data);
 
 export const postOrder = (ingredients: string[]): Promise<TOrderResponse> =>
-  request<TOrderResponse>(ORDERS_URL, {
+  fetchWithRefresh<TOrderResponse>(ORDERS_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...getAuthHeader(),
     },
     body: JSON.stringify({ ingredients }),
   });
