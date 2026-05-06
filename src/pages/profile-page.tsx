@@ -42,7 +42,7 @@ export const ProfilePage = (): React.JSX.Element => {
           <p
             className={`${styles.description} text text_type_main-default text_color_inactive`}
           >
-            В этом разделе вы можете изменить свои персональные данные
+            В этом разделе вы можете просмотреть свою историю заказов
           </p>
         </div>
 

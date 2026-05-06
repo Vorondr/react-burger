@@ -1,0 +1,53 @@
+.page {
+  width: 1240px;
+  margin: 0 auto;
+  padding-top: 40px;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 600px 580px;
+  column-gap: 60px;
+}
+
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 188px);
+  padding-right: 8px;
+  overflow-y: auto;
+}
+
+.stats {
+  padding-top: 16px;
+}
+
+.statuses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 36px;
+}
+
+.statusColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  column-gap: 24px;
+}
+
+.statusList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.done {
+  color: #0cc;
+}
+
+.total {
+  text-shadow:
+    0 0 16px rgb(51 51 255 / 25%),
+    0 0 8px rgb(51 51 255 / 25%),
+    0 4px 32px rgb(51 51 255 / 50%);
+}
