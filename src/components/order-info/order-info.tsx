@@ -1,7 +1,14 @@
-import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
-import { useParams } from 'react-router-dom';
+import { CurrencyIcon, Preloader } from '@krgaa/react-developer-burger-ui-components';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 
-import { useAppSelector } from '@services/hooks';
+import { useAppDispatch, useAppSelector } from '@services/hooks';
+import { feedConnect, feedDisconnect } from '@services/slices/feedSlice';
+import {
+  profileOrdersConnect,
+  profileOrdersDisconnect,
+} from '@services/slices/profileOrdersSlice';
+import { getOrderByNumberRequest } from '@utils/order-api';
 import {
   formatOrderDate,
   getOrderIngredients,
@@ -9,7 +16,7 @@ import {
   getStatusText,
 } from '@utils/order-helpers';
 
-import type { TIngredient } from '@utils/types';
+import type { TIngredient, TOrder } from '@utils/types';
 
 import styles from './order-info.module.css';
 
@@ -23,16 +30,111 @@ type TIngredientWithCount = TIngredient & {
 
 export const OrderInfo = ({ isModal = false }: TOrderInfoProps): React.JSX.Element => {
   const { id } = useParams();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+
+  const isProfileOrder = location.pathname.startsWith('/profile/orders');
+
   const ingredients = useAppSelector((state) => state.ingredients.ingredients);
 
   const feedOrders = useAppSelector((state) => state.feed.orders);
+  const isFeedConnected = useAppSelector((state) => state.feed.isConnected);
+  const feedError = useAppSelector((state) => state.feed.error);
+
   const profileOrders = useAppSelector((state) => state.profileOrders.orders);
-
-  const order = [...feedOrders, ...profileOrders].find(
-    (item) => String(item.number) === id
+  const isProfileOrdersConnected = useAppSelector(
+    (state) => state.profileOrders.isConnected
   );
+  const profileOrdersError = useAppSelector((state) => state.profileOrders.error);
 
-  if (!order) {
+  const orders = isProfileOrder ? profileOrders : feedOrders;
+  const isSocketConnected = isProfileOrder ? isProfileOrdersConnected : isFeedConnected;
+  const socketError = isProfileOrder ? profileOrdersError : feedError;
+
+  const orderFromStore = useMemo(() => {
+    return orders.find((item) => String(item.number) === id);
+  }, [orders, id]);
+
+  const [loadedOrder, setLoadedOrder] = useState<TOrder | null>(null);
+  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(false);
+
+  const order = orderFromStore ?? loadedOrder;
+
+  useEffect((): (() => void) | void => {
+    if (isModal) {
+      return;
+    }
+
+    if (isProfileOrder) {
+      dispatch(profileOrdersConnect());
+
+      return (): void => {
+        dispatch(profileOrdersDisconnect());
+      };
+    }
+
+    dispatch(feedConnect());
+
+    return (): void => {
+      dispatch(feedDisconnect());
+    };
+  }, [dispatch, isModal, isProfileOrder]);
+
+  useEffect((): (() => void) | void => {
+    if (!id || orderFromStore || loadedOrder) {
+      return;
+    }
+
+    if (!isSocketConnected && !socketError) {
+      return;
+    }
+
+    const timer = setTimeout((): void => {
+      setIsLoadingOrder(true);
+      setOrderError(false);
+
+      void getOrderByNumberRequest(id)
+        .then((data): void => {
+          const foundOrder = data.orders[0];
+
+          if (!foundOrder) {
+            setOrderError(true);
+            return;
+          }
+
+          setLoadedOrder(foundOrder);
+        })
+        .catch((): void => {
+          setOrderError(true);
+        })
+        .finally((): void => {
+          setIsLoadingOrder(false);
+        });
+    }, 700);
+
+    return (): void => {
+      clearTimeout(timer);
+    };
+  }, [id, orderFromStore, loadedOrder, isSocketConnected, socketError]);
+
+  if (!order && !orderError) {
+    return (
+      <section className={isModal ? styles.modal : styles.page}>
+        <Preloader />
+      </section>
+    );
+  }
+
+  if (isLoadingOrder) {
+    return (
+      <section className={isModal ? styles.modal : styles.page}>
+        <Preloader />
+      </section>
+    );
+  }
+
+  if (!order || orderError) {
     return (
       <section className={isModal ? styles.modal : styles.page}>
         <p className="text text_type_main-medium">Заказ не найден</p>
@@ -64,12 +166,16 @@ export const OrderInfo = ({ isModal = false }: TOrderInfoProps): React.JSX.Eleme
   return (
     <section className={isModal ? styles.modal : styles.page}>
       <p
-        className={`${isModal ? styles.numberModal : styles.numberPage} text text_type_digits-default mb-10`}
+        className={`${
+          isModal ? styles.numberModal : styles.numberPage
+        } text text_type_digits-default mb-10`}
       >
         #{order.number}
       </p>
 
-      <h1 className="text text_type_main-medium mb-3">{order.name}</h1>
+      <h1 className="text text_type_main-medium mb-3">
+        {order.name ?? 'Неназванный бургер'}
+      </h1>
 
       <p className={`${styles.status} text text_type_main-default mb-15`}>
         {getStatusText(order.status)}
