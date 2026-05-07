@@ -1,6 +1,4 @@
 .page {
-  display: flex;
-  justify-content: center;
   padding-top: 120px;
 }
 
@@ -8,6 +6,7 @@
   display: flex;
   gap: 60px;
   width: 1240px;
+  margin: 0 auto;
 }
 
 .sidebar {
@@ -49,7 +48,6 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  appearance: none;
   appearance: none;
 }
 

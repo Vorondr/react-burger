@@ -12,3 +12,27 @@ export type TIngredient = {
   image_mobile: string;
   __v: number;
 };
+
+export type TOrderStatus = 'created' | 'pending' | 'done';
+
+export type TOrder = {
+  _id: string;
+  ingredients: string[];
+  status: TOrderStatus;
+  number: number;
+  createdAt: string;
+  updatedAt: string;
+  name?: string;
+};
+
+export type TOrdersResponse = {
+  success: boolean;
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+};
+
+export type TOrderByNumberResponse = {
+  success: boolean;
+  orders: TOrder[];
+};

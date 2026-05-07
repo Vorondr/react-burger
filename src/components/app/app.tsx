@@ -10,6 +10,7 @@ import {
 
 import { AppHeader } from '@components/app-header/app-header';
 import { Modal } from '@components/modal/modal';
+import { OrderInfo } from '@components/order-info/order-info';
 import { ProtectedRoute } from '@components/protected-route';
 import { FeedPage } from '@pages/feed-page';
 import { ForgotPasswordPage } from '@pages/forgot-password-page';
@@ -17,6 +18,7 @@ import { Home } from '@pages/home';
 import { IngredientPage } from '@pages/ingredient';
 import { LoginPage } from '@pages/login-page';
 import { NotFound404 } from '@pages/not-found-404';
+import { OrderPage } from '@pages/order-page';
 import { ProfileFormPage } from '@pages/profile-form-page';
 import { ProfileOrdersPage } from '@pages/profile-orders-page';
 import { ProfilePage } from '@pages/profile-page';
@@ -67,7 +69,9 @@ export const App = (): React.JSX.Element => {
 
       <Routes location={background ?? location}>
         <Route path="/" element={<Home />} />
+
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/feed/:id" element={<OrderPage />} />
 
         <Route
           path="/register"
@@ -115,6 +119,14 @@ export const App = (): React.JSX.Element => {
         >
           <Route index element={<ProfileFormPage />} />
           <Route path="orders" element={<ProfileOrdersPage />} />
+          <Route
+            path="orders/:id"
+            element={
+              <ProtectedRoute>
+                <OrderPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         <Route path="/ingredients/:id" element={<IngredientPage />} />
@@ -126,9 +138,29 @@ export const App = (): React.JSX.Element => {
           <Route
             path="/ingredients/:id"
             element={
-              <Modal onClose={handleCloseModal} title="Детали ингредиента">
+              <Modal onClose={handleCloseModal}>
                 <IngredientPage />
               </Modal>
+            }
+          />
+
+          <Route
+            path="/feed/:id"
+            element={
+              <Modal onClose={handleCloseModal}>
+                <OrderInfo isModal />
+              </Modal>
+            }
+          />
+
+          <Route
+            path="/profile/orders/:id"
+            element={
+              <ProtectedRoute>
+                <Modal onClose={handleCloseModal}>
+                  <OrderInfo isModal />
+                </Modal>
+              </ProtectedRoute>
             }
           />
         </Routes>
